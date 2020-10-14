@@ -22,7 +22,8 @@ class LambdaConfig(BaseConfig):
 
     def __init__(self, diktionary):
         super().__init__(diktionary)
-        self.base_data = super(LambdaConfig, type(self)).data.fget(self)
+        self.base_data_property = super(LambdaConfig, type(self)).data
+        self.lambda_data = self.base_data['aws_lambda']
 
     @property
     def data(self):
@@ -30,7 +31,7 @@ class LambdaConfig(BaseConfig):
     
     @data.setter
     def data(self, new_value):
-        super(LambdaConfig, type(self))._data.fset(self, new_value)
+        self.base_data_property.fset(self, new_value)
         
     @property
     def dir(self):
@@ -40,11 +41,9 @@ class LambdaConfig(BaseConfig):
 
     @dir.setter
     def dir(self, new_value):
-        #logging.debug(f"LambdaConfig.dir.setter: base_data = {base_data}")
-        logging.info(f"LambdaConfig: dir setter before setting to {new_value} is '{self.base_data['aws_lambda']['dir']}'")
-        self.base_data['aws_lambda']['dir'] = new_value
-        #logging.debug(f"LambdaConfig.dir.setter after set: base_data = {base_data}")
-        logging.info(f"LambdaConfig.dir setter after set: self.base_data['dir'] = '{self.base_data['aws_lambda']['dir']}'")
+        logging.info(f"LambdaConfig: dir setter before setting to {new_value} is '{self.lambda_data['dir']}'")
+        self.lambda_data['dir'] = new_value
+        logging.info(f"LambdaConfig.dir setter after set: self.base_data['dir'] = '{self.lambda_data['dir']}'")
 
 
 if __name__ == "__main__":
