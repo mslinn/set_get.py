@@ -4,16 +4,15 @@ Output:
 
 ```
 $ python3 set_get.py 
-INFO main: base_config.data = {'aws_lambda': {'dir': 'old_value'}}
-INFO main: lambda_data = {'dir': 'old_value'}
-INFO main: lambda_data['dir'] = old_value
-INFO 
-INFO Superclass data can be changed from the superclass, new value appears everywhere:
-INFO main: base_config.data['aws_lambda']['dir'] (#1) = first_new_value
-INFO main: lambda_data['dir'] (#1) = first_new_value
-INFO 
 INFO Superclass data can be changed from the subclass, new value appears everywhere:
 INFO main: Creating a new LambdaConfig, which creates a new BaseConfig
-INFO main: lambda_data['dir'] = second_new_value
-INFO main: base_config.data['aws_lambda']['dir'] (#2) = second_new_value
+INFO BaseConfig.__init__: set self.base_data = '{'aws_lambda': {'dir': 'old_value'}}'
+INFO BaseConfig: self.data getter returning = '{'aws_lambda': {'dir': 'old_value'}}'
+INFO main: aws_lambda_data = {'dir': 'old_value'}
+INFO BaseConfig: self.data getter returning = '{'aws_lambda': {'dir': 'old_value'}}'
+INFO LambdaConfig: dir setter before setting to first_new_value is 'old_value'
+INFO LambdaConfig.dir setter after set: base_data['dir'] = 'first_new_value'
+INFO main: after setting lambda_config.dir='first_new_value', aws_lambda_data['dir'] = first_new_value
+INFO main: aws_lambda_data = {'dir': 'first_new_value'}
+INFO main: aws_lambda_data['dir'] = first_new_value
 ```
