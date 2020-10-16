@@ -33,6 +33,8 @@ class LambdaConfig(BaseConfig):
     def data(self, new_value):
         self.base_data_property.fset(self, new_value)
         
+    # Properties specific to this class follow
+        
     @property
     def dir(self):
         result = self.data['dir']
