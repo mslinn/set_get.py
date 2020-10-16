@@ -29,7 +29,7 @@ class LambdaConfig(BaseConfig):
     for example, this subclass only looks at and modifies data within super().data['aws_lambda'].
     """
 
-    # Start of boilerplate
+    # Start of boilerplate; each BaseConfig subclass needs something like the following:
 
     def __init__(self, _dictionary):
         super().__init__(_dictionary)
@@ -54,8 +54,7 @@ class LambdaConfig(BaseConfig):
 
     @property
     def dir(self):
-        result = self.data['dir']
-        return result
+        return self.data['dir']
 
     @dir.setter
     def dir(self, new_value):
