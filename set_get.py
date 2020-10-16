@@ -30,19 +30,17 @@ class LambdaConfig(BaseConfig):
 
     def __init__(self, diktionary):
         super().__init__(diktionary)
-        # See https://stackoverflow.com/a/10810545/553865:
-        self.base_data_property = super(LambdaConfig, type(self)).data
-        # This subclass only modifies data contained within self.lambda_data:
-        self.lambda_data = super().data['aws_lambda']
 
     @property
     def lambda_data(self):
-        return self.base_data_property.fget(self)['aws_lambda']
+        return self.data['aws_lambda']
 
     @lambda_data.setter
     def lambda_data(self, new_value):
-        super().data['aws_lambda'] = new_value
-        self.base_data_property.fset(self, super().data)
+        data = self.data
+        data['aws_lambda'] = new_value
+        self.data = data  # Trigger the super() @data.setter, which saves to a file
+
 
     # Properties specific to this class follow
 
@@ -56,8 +54,9 @@ class LambdaConfig(BaseConfig):
     def dir(self, new_value):
         logging.info(f"LambdaConfig: dir setter before setting to {new_value} is '{self.lambda_data['dir']}'")
         # Python's call by value means super().data is called, which modifies super().base_data:
-        self.lambda_data['dir'] = new_value
-        self.base_data_property.fset(self, super().data)  # This no-op merely triggers super().@data.setter
+        lambda_data = self.lambda_data
+        lambda_data['dir'] = new_value
+        self.lambda_data = lambda_data
         logging.info(f"LambdaConfig.dir setter after set: self.lambda_data['dir'] = '{self.lambda_data['dir']}'")
 
 
@@ -67,8 +66,9 @@ class LambdaConfig(BaseConfig):
 
     @name.setter
     def name(self, new_value):  # Comments are as for the dir property
-        self.lambda_data['name'] = new_value
-        self.base_data_property.fset(self, super().data)
+        lambda_data = self.lambda_data
+        lambda_data['name'] = new_value
+        self.lambda_data = lambda_data
 
 
     @property
@@ -77,8 +77,9 @@ class LambdaConfig(BaseConfig):
 
     @id.setter
     def id(self, new_value):  # Comments are as for the dir property
-        self.lambda_data['id'] = new_value
-        self.base_data_property.fset(self, super().data)
+        lambda_data = self.lambda_data
+        lambda_data['id'] = new_value
+        self.lambda_data = lambda_data
 
 
 if __name__ == "__main__":
@@ -92,6 +93,10 @@ if __name__ == "__main__":
             "dir": "old_dir",
             "name": "old_name",
             "id": "old_id"
+        },
+        "more_keys": {
+            "key1": "old_value1",
+            "key2": "old_value2"
         }
     }
 
@@ -112,8 +117,12 @@ if __name__ == "__main__":
     logging.info(f"main: after setting lambda_config.name='new_name', aws_lambda_data['name'] = {aws_lambda_data['name']}")
     logging.info(f"main: aws_lambda_data = {aws_lambda_data}")
     logging.info(f"main: aws_lambda_data['name'] = '{aws_lambda_data['name']}'")
+    logging.info("")
 
     lambda_config.id = "new_id"
     logging.info(f"main: after setting lambda_config.id='new_id', aws_lambda_data['id'] = {aws_lambda_data['id']}")
     logging.info(f"main: aws_lambda_data = {aws_lambda_data}")
     logging.info(f"main: aws_lambda_data['id'] = '{aws_lambda_data['id']}'")
+    logging.info("")
+
+    logging.info(f"main: lambda_config.data = {lambda_config.data}")
