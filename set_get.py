@@ -2,9 +2,10 @@ import logging
 
 
 class BaseConfig:
+    """ See https://stackoverflow.com/q/64389885/553865 """
 
-    def __init__(self, diktionary):
-        self._base_data = diktionary
+    def __init__(self, _dictionary):
+        self._base_data = _dictionary
         logging.info(f"BaseConfig.__init__: set self.base_data = '{self._base_data}'")
 
     def save_data(self):
@@ -28,8 +29,10 @@ class LambdaConfig(BaseConfig):
     for example, this subclass only looks at and modifies data within super().data['aws_lambda'].
     """
 
-    def __init__(self, diktionary):
-        super().__init__(diktionary)
+    # Start of boilerplate
+
+    def __init__(self, _dictionary):
+        super().__init__(_dictionary)
 
     @property
     def lambda_data(self):
@@ -39,47 +42,42 @@ class LambdaConfig(BaseConfig):
     def lambda_data(self, new_value):
         data = self.data
         data['aws_lambda'] = new_value
-        self.data = data  # Trigger the super() @data.setter, which saves to a file
+        self.data = data  # Trigger the super() data.setter, which saves to a file
 
+    def generalized_setter(self, key, new_value):
+        lambda_data = self.lambda_data
+        lambda_data[key] = new_value
+        # Python's call by value means the super().data setter is called, which modifies super().base_data:
+        self.lambda_data = lambda_data
 
-    # Properties specific to this class follow
+    # End of boilerplate. Properties specific to this class follow:
 
     @property
     def dir(self):
         result = self.data['dir']
-        logging.info(f"LambdaConfig: Getting dir = '{result}'")
         return result
 
     @dir.setter
     def dir(self, new_value):
-        logging.info(f"LambdaConfig: dir setter before setting to {new_value} is '{self.lambda_data['dir']}'")
-        # Python's call by value means super().data is called, which modifies super().base_data:
-        lambda_data = self.lambda_data
-        lambda_data['dir'] = new_value
-        self.lambda_data = lambda_data
-        logging.info(f"LambdaConfig.dir setter after set: self.lambda_data['dir'] = '{self.lambda_data['dir']}'")
+        self.generalized_setter("dir", new_value)
 
 
     @property
-    def name(self):  # Comments are as for the dir property
+    def name(self):
         return self.data['name']
 
     @name.setter
-    def name(self, new_value):  # Comments are as for the dir property
-        lambda_data = self.lambda_data
-        lambda_data['name'] = new_value
-        self.lambda_data = lambda_data
+    def name(self, new_value):
+        self.generalized_setter("name", new_value)
 
 
     @property
-    def id(self):  # Comments are as for the dir property
+    def id(self):
         return self.data['id']
 
     @id.setter
-    def id(self, new_value):  # Comments are as for the dir property
-        lambda_data = self.lambda_data
-        lambda_data['id'] = new_value
-        self.lambda_data = lambda_data
+    def id(self, new_value):
+        self.generalized_setter("id", new_value)
 
 
 if __name__ == "__main__":
